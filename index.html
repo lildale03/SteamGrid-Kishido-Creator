@@ -3,18 +3,26 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Steam Grid Card Studio</title>
-    <!-- Tailwind CSS -->
-    <script src="https://cdn.tailwindcss.com"></script>
-    <!-- FontAwesome Icons -->
+    <title>Kishido Grid Studio</title>
+    <!-- Favicon to prevent 404 errors -->
     <link
-      rel="stylesheet"
-      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"
+      rel="icon"
+      href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🧰</text></svg>"
     />
+    <!-- Tailwind CSS (Using production standalone CDN for 100% layout reliability) -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script
+      src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/js/all.min.js"
+      crossorigin="anonymous"
+    ></script>
     <style>
-      @import url("https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap");
+      @import url("https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap");
       body {
         font-family: "Inter", sans-serif;
+      }
+
+      .card-font {
+        font-family: "CustomCardFont", "Inter", sans-serif;
       }
 
       ::-webkit-scrollbar {
@@ -54,14 +62,23 @@
           0 8px 10px -6px rgba(0, 0, 0, 0.5);
         z-index: 9999;
       }
+
+      /* Stage pan cursor handling */
+      .stage-grab {
+        cursor: grab;
+      }
+      .stage-grabbing {
+        cursor: grabbing !important;
+        user-select: none !important;
+      }
     </style>
   </head>
   <body
-    class="bg-slate-950 text-slate-100 min-h-screen flex flex-col antialiased selection:bg-cyan-500 selection:text-white"
+    class="bg-slate-950 text-slate-100 min-h-screen flex flex-col antialiased selection:bg-cyan-500 selection:text-white overflow-hidden"
   >
     <!-- Header Bar -->
     <header
-      class="bg-slate-900 border-b border-slate-800 px-6 py-3 flex items-center justify-between flex-shrink-0"
+      class="bg-slate-900 border-b border-slate-800 px-6 py-3 flex items-center justify-between flex-shrink-0 z-30"
     >
       <div class="flex items-center gap-3">
         <div
@@ -71,10 +88,10 @@
         </div>
         <div>
           <h1 class="text-sm font-bold tracking-tight text-white">
-            Steam Grid Card Studio
+            Kishido Grid Studio
           </h1>
           <p class="text-[11px] text-slate-400">
-            Minimalist Swiss Poster & Series Generator
+            Steam Grid Creator based on Kishido05's work
           </p>
         </div>
       </div>
@@ -375,77 +392,12 @@ Game Title</textarea
                 <i class="fa-solid fa-vector-square text-emerald-400"></i>
                 Center Emblem
               </h2>
-              <div class="flex items-center gap-2">
-                <button
-                  id="btn-open-sgdb"
-                  class="text-[11px] text-cyan-400 hover:text-cyan-300 font-medium flex items-center gap-1"
-                >
-                  <i class="fa-solid fa-globe"></i> SteamGridDB Search
-                </button>
-                <button
-                  id="btn-reset-triangle"
-                  class="text-[11px] text-slate-400 hover:text-slate-300 font-medium flex items-center gap-1"
-                >
-                  <i class="fa-solid fa-rotate-left"></i> Reset
-                </button>
-              </div>
-            </div>
-
-            <!-- SGDB Search Modal Drawer -->
-            <div
-              id="sgdb-drawer"
-              class="hidden p-3 rounded-lg bg-slate-950 border border-slate-800 space-y-3"
-            >
-              <div class="flex items-center justify-between">
-                <span class="text-xs font-semibold text-white"
-                  ><i class="fa-solid fa-key text-amber-400 mr-1"></i>
-                  SteamGridDB API Key</span
-                >
-                <button
-                  id="sgdb-close"
-                  class="text-slate-400 hover:text-white text-xs"
-                >
-                  <i class="fa-solid fa-xmark"></i>
-                </button>
-              </div>
-              <div class="flex gap-1.5">
-                <input
-                  type="password"
-                  id="sgdb-api-key"
-                  placeholder="Enter API Key"
-                  class="flex-1 bg-slate-900 border border-slate-700 rounded px-2 py-1.5 text-xs text-white font-mono"
-                />
-                <button
-                  id="sgdb-save-key"
-                  class="bg-slate-800 hover:bg-slate-700 text-slate-200 px-2.5 py-1.5 rounded text-xs font-medium"
-                >
-                  Save
-                </button>
-              </div>
-              <div class="space-y-1.5 pt-1">
-                <div class="flex gap-1.5">
-                  <input
-                    type="text"
-                    id="sgdb-search-input"
-                    placeholder="Search game title..."
-                    class="flex-1 bg-slate-900 border border-slate-700 rounded px-2.5 py-1.5 text-xs text-white"
-                  />
-                  <button
-                    id="sgdb-search-btn"
-                    class="bg-cyan-600 hover:bg-cyan-500 text-white px-3 py-1.5 rounded text-xs font-medium"
-                  >
-                    Search
-                  </button>
-                </div>
-                <div
-                  id="sgdb-results"
-                  class="max-h-48 overflow-y-auto space-y-1 pt-1"
-                >
-                  <div class="text-[11px] text-slate-500 text-center py-4">
-                    Enter API key & search for a game to load logos instantly
-                  </div>
-                </div>
-              </div>
+              <button
+                id="btn-reset-triangle"
+                class="text-[11px] text-slate-400 hover:text-slate-300 font-medium flex items-center gap-1"
+              >
+                <i class="fa-solid fa-rotate-left"></i> Reset
+              </button>
             </div>
 
             <!-- File Upload Box -->
@@ -641,176 +593,212 @@ Game Title</textarea
 
       <!-- Right Stage: Live Interactive Card Preview -->
       <section
-        class="flex-1 bg-slate-950 flex flex-col items-center justify-center p-6 relative overflow-hidden"
+        class="flex-1 bg-slate-950 flex items-center justify-center relative overflow-hidden select-none stage-grab"
         id="stage-area"
       >
-        <!-- Card Viewport Container -->
+        <!-- Floating Viewport Controls (Zoom & Pan) -->
         <div
-          id="card-viewport"
-          class="relative shadow-2xl rounded-sm transition-all duration-300 flex items-center justify-center select-none"
-          style="width: 400px; height: 600px"
+          class="absolute top-4 right-4 z-30 flex items-center bg-slate-900/90 backdrop-blur-md border border-slate-700/80 rounded-xl p-1 shadow-2xl gap-1"
         >
-          <!-- The Actual 600x900 SVG / HTML Canvas Master Card -->
-          <div
-            id="card-root"
-            class="absolute w-[600px] h-[900px] origin-top-left transform scale-[0.666666] select-none"
-            style="background-color: #eeeade"
+          <button
+            id="btn-zoom-out"
+            title="Zoom Out"
+            class="w-8 h-8 rounded-lg hover:bg-slate-800 text-slate-300 hover:text-white flex items-center justify-center text-xs transition"
           >
-            <!-- 1. Top Accent Bars (Exact SVG Coordinates) -->
-            <!-- Left Bar (Primary Accent / Lighter) -->
-            <div
-              id="node-bar-left"
-              class="absolute"
-              style="
-                left: 48.8px;
-                top: 32.51px;
-                width: 75.12px;
-                height: 18.77px;
-                background-color: #00ac9c;
-              "
-            ></div>
-            <!-- Right Bar (Secondary Accent / Darker) -->
-            <div
-              id="node-bar-right"
-              class="absolute"
-              style="
-                left: 123.91px;
-                top: 32.51px;
-                width: 75.12px;
-                height: 18.77px;
-                background-color: #007471;
-              "
-            ></div>
+            <i class="fa-solid fa-minus"></i>
+          </button>
+          <button
+            id="btn-zoom-reset"
+            title="Reset View"
+            class="px-2.5 h-8 rounded-lg hover:bg-slate-800 text-slate-300 hover:text-white text-xs font-mono font-medium transition flex items-center gap-1"
+          >
+            <span id="zoom-level-text">100%</span>
+            <i class="fa-solid fa-arrows-rotate text-[10px] text-slate-400"></i>
+          </button>
+          <button
+            id="btn-zoom-in"
+            title="Zoom In"
+            class="w-8 h-8 rounded-lg hover:bg-slate-800 text-slate-300 hover:text-white flex items-center justify-center text-xs transition"
+          >
+            <i class="fa-solid fa-plus"></i>
+          </button>
+        </div>
 
-            <!-- 2. Publisher Label -->
+        <!-- Pan / Zoom Transform Wrapper -->
+        <div
+          id="viewport-transform-wrapper"
+          class="relative will-change-transform flex items-center justify-center"
+          style="transform: translate(0px, 0px) scale(1)"
+        >
+          <!-- Card Viewport Container: 400x600 px (exact 2:3 ratio) -->
+          <div
+            id="card-viewport"
+            class="relative shadow-2xl rounded-sm overflow-hidden select-none"
+            style="
+              width: 400px;
+              height: 600px;
+              min-width: 400px;
+              min-height: 600px;
+            "
+          >
+            <!-- The Actual 600x900 Master Card Scaled by 0.666667 (400/600) -->
             <div
-              id="node-publisher"
-              class="absolute font-semibold tracking-wide uppercase"
+              id="card-root"
+              class="absolute select-none"
               style="
-                right: 48.8px;
-                top: 36.67px;
-                font-size: 21.33px;
-                color: #999999;
-                font-family:
-                  &quot;Museo Sans Cyrl&quot;, &quot;MuseoSansCyrl-900&quot;,
-                  &quot;Inter&quot;, sans-serif;
-              "
-            >
-              DEVELOPER
-            </div>
-
-            <!-- 3. Title (Multi-line) -->
-            <div
-              id="node-title-container"
-              class="absolute font-bold tracking-tight"
-              style="
-                left: 48.8px;
-                top: 92.77px;
-                width: 502.4px;
-                line-height: 1.08;
-                font-size: 48px;
-                color: #000000;
-                font-family:
-                  &quot;Museo Sans Cyrl&quot;, &quot;MuseoSansCyrl-900&quot;,
-                  &quot;Inter&quot;, sans-serif;
-              "
-            >
-              Game Title
-            </div>
-
-            <!-- 4. Center Graphic Block (x: 48.8px, y: 220px, w: 502.4px, h: 520px) -->
-            <div
-              id="node-center-block"
-              class="absolute rounded overflow-hidden cursor-pointer group"
-              style="
-                left: 48.8px;
-                top: 220px;
-                width: 502.4px;
-                height: 520px;
-                background-color: #00ac9c;
-              "
-              title="Click to upload emblem"
-            >
-              <div
-                id="emblem-container"
-                class="w-full h-full flex items-center justify-center relative overflow-visible"
-              >
-                <!-- Default Triangle SVG -->
-                <svg
-                  id="default-emblem-svg"
-                  viewBox="0 0 512 512"
-                  class="w-3/4 h-3/4 drop-shadow-md transition-all"
-                >
-                  <polygon points="256,64 480,448 32,448" fill="#ffffff" />
-                </svg>
-                <!-- Custom Emblem Image/SVG -->
-                <img
-                  id="custom-emblem-img"
-                  class="hidden max-w-none transition-all object-contain"
-                  alt="Emblem"
-                />
-              </div>
-              <!-- Hover overlay -->
-              <div
-                class="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center pointer-events-none"
-              >
-                <span
-                  class="bg-slate-900/90 text-white text-xs px-3 py-1.5 rounded-lg font-medium shadow-lg border border-slate-700 flex items-center gap-1.5"
-                >
-                  <i class="fa-solid fa-cloud-arrow-up text-cyan-400"></i> Click
-                  or Paste Logo
-                </span>
-              </div>
-            </div>
-
-            <!-- 5. Release Year (Positioned in bottom-right below center block) -->
-            <div
-              id="node-year"
-              class="absolute font-semibold tracking-wider text-right"
-              style="
-                right: 48.8px;
-                top: 760px;
-                font-size: 32px;
-                color: #999999;
-                font-family:
-                  &quot;Museo Sans Cyrl&quot;, &quot;MuseoSansCyrl-900&quot;,
-                  &quot;Inter&quot;, sans-serif;
-              "
-            >
-              /2024
-            </div>
-
-            <!-- 6. Platform Footer Bar -->
-            <div
-              id="node-footer-bar"
-              class="absolute flex items-center justify-center"
-              style="
-                left: 0px;
-                top: 829.06px;
                 width: 600px;
-                height: 50.06px;
-                background-color: #00ac9c;
+                height: 900px;
+                left: 0;
+                top: 0;
+                transform-origin: 0 0;
+                transform: scale(0.66666667);
+                background-color: #eeeade;
               "
             >
+              <!-- 1. Top Accent Bars (Exact SVG Coordinates) -->
+              <!-- Left Bar (Primary Accent / Lighter) -->
               <div
-                id="node-footer-text"
-                class="uppercase font-bold tracking-widest text-white"
+                id="node-bar-left"
+                class="absolute"
                 style="
-                  font-size: 32px;
-                  font-family:
-                    &quot;Museo Sans Cyrl&quot;, &quot;MuseoSansCyrl-900&quot;,
-                    &quot;Inter&quot;, sans-serif;
+                  left: 48.8px;
+                  top: 32.51px;
+                  width: 75.12px;
+                  height: 18.77px;
+                  background-color: #00ac9c;
+                "
+              ></div>
+              <!-- Right Bar (Secondary Accent / Darker) -->
+              <div
+                id="node-bar-right"
+                class="absolute"
+                style="
+                  left: 123.91px;
+                  top: 32.51px;
+                  width: 75.12px;
+                  height: 18.77px;
+                  background-color: #007471;
+                "
+              ></div>
+
+              <!-- 2. Publisher Label -->
+              <div
+                id="node-publisher"
+                class="absolute font-semibold tracking-wide uppercase card-font text-right"
+                style="
+                  right: 48.8px;
+                  top: 36.67px;
+                  font-size: 21.33px;
+                  color: #999999;
                 "
               >
-                PC
+                DEVELOPER
+              </div>
+
+              <!-- 3. Title (Multi-line) -->
+              <div
+                id="node-title-container"
+                class="absolute font-bold tracking-tight card-font whitespace-pre-line"
+                style="
+                  left: 48.8px;
+                  top: 92.77px;
+                  width: 502.4px;
+                  line-height: 1.08;
+                  font-size: 48px;
+                  color: #000000;
+                "
+              >
+                Game Title
+              </div>
+
+              <!-- 4. Center Graphic Block (x: 48.8px, y: 220px, w: 502.4px, h: 520px) -->
+              <div
+                id="node-center-block"
+                class="absolute rounded overflow-hidden cursor-pointer group"
+                style="
+                  left: 48.8px;
+                  top: 220px;
+                  width: 502.4px;
+                  height: 520px;
+                  background-color: #00ac9c;
+                "
+                title="Click to upload emblem"
+              >
+                <div
+                  id="emblem-container"
+                  class="w-full h-full flex items-center justify-center relative overflow-visible"
+                >
+                  <!-- Default Triangle SVG -->
+                  <svg
+                    id="default-emblem-svg"
+                    viewBox="0 0 512 512"
+                    class="w-3/4 h-3/4 drop-shadow-md transition-all"
+                  >
+                    <polygon points="256,64 480,448 32,448" fill="#ffffff" />
+                  </svg>
+                  <!-- Custom Emblem Image/SVG -->
+                  <img
+                    id="custom-emblem-img"
+                    class="hidden max-w-none transition-all object-contain"
+                    alt="Emblem"
+                  />
+                </div>
+                <!-- Hover overlay -->
+                <div
+                  class="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center pointer-events-none"
+                >
+                  <span
+                    class="bg-slate-900/90 text-white text-xs px-3 py-1.5 rounded-lg font-medium shadow-lg border border-slate-700 flex items-center gap-1.5"
+                  >
+                    <i class="fa-solid fa-cloud-arrow-up text-cyan-400"></i>
+                    Click or Paste Logo
+                  </span>
+                </div>
+              </div>
+
+              <!-- 5. Release Year (Positioned in bottom-right below center block) -->
+              <div
+                id="node-year"
+                class="absolute font-semibold tracking-wider text-right card-font"
+                style="
+                  right: 48.8px;
+                  top: 760px;
+                  font-size: 32px;
+                  color: #999999;
+                "
+              >
+                /2024
+              </div>
+
+              <!-- 6. Platform Footer Bar -->
+              <div
+                id="node-footer-bar"
+                class="absolute flex items-center justify-center"
+                style="
+                  left: 0px;
+                  top: 829.06px;
+                  width: 600px;
+                  height: 50.06px;
+                  background-color: #00ac9c;
+                "
+              >
+                <div
+                  id="node-footer-text"
+                  class="uppercase font-bold tracking-widest text-white card-font"
+                  style="font-size: 32px"
+                >
+                  PC
+                </div>
               </div>
             </div>
           </div>
         </div>
 
         <!-- Stage Footer Hint -->
-        <div class="absolute bottom-4 text-[11px] text-slate-500 font-medium">
-          Steam Grid Art Format (600 × 900 px) · Paste
+        <div
+          class="absolute bottom-4 text-[11px] text-slate-500 font-medium pointer-events-none select-none z-10"
+        >
+          Drag to Pan · Scroll to Zoom · Paste
           <span class="text-cyan-400 font-mono">Ctrl+V</span> anywhere to add
           logos
         </div>
@@ -922,6 +910,97 @@ Game Title</textarea
         offsetY: 0,
       };
 
+      // --- Stage Viewport Engine (Zoom & Pan) ---
+      const viewportState = {
+        scale: 1.0,
+        panX: 0,
+        panY: 0,
+        isPanning: false,
+        startX: 0,
+        startY: 0,
+      };
+
+      const stageArea = document.getElementById("stage-area");
+      const transformWrapper = document.getElementById(
+        "viewport-transform-wrapper",
+      );
+      const zoomLevelText = document.getElementById("zoom-level-text");
+      const btnZoomIn = document.getElementById("btn-zoom-in");
+      const btnZoomOut = document.getElementById("btn-zoom-out");
+      const btnZoomReset = document.getElementById("btn-zoom-reset");
+
+      function updateViewportTransform() {
+        transformWrapper.style.transform = `translate(${viewportState.panX}px, ${viewportState.panY}px) scale(${viewportState.scale})`;
+        zoomLevelText.innerText = `${Math.round(viewportState.scale * 100)}%`;
+      }
+
+      function zoom(delta) {
+        const newScale = Math.min(
+          3.0,
+          Math.max(0.4, viewportState.scale + delta),
+        );
+        viewportState.scale = Math.round(newScale * 100) / 100;
+        updateViewportTransform();
+      }
+
+      btnZoomIn.addEventListener("click", (e) => {
+        e.stopPropagation();
+        zoom(0.15);
+      });
+      btnZoomOut.addEventListener("click", (e) => {
+        e.stopPropagation();
+        zoom(-0.15);
+      });
+      btnZoomReset.addEventListener("click", (e) => {
+        e.stopPropagation();
+        viewportState.scale = 1.0;
+        viewportState.panX = 0;
+        viewportState.panY = 0;
+        updateViewportTransform();
+      });
+
+      // Pan & Drag Handlers
+      stageArea.addEventListener("mousedown", (e) => {
+        // Prevent drag panning if clicking inside interactive UI elements
+        if (
+          e.target.closest("#node-center-block") ||
+          e.target.closest("button") ||
+          e.target.closest("input")
+        )
+          return;
+        viewportState.isPanning = true;
+        stageArea.classList.remove("stage-grab");
+        stageArea.classList.add("stage-grabbing");
+        viewportState.startX = e.clientX - viewportState.panX;
+        viewportState.startY = e.clientY - viewportState.panY;
+      });
+
+      window.addEventListener("mousemove", (e) => {
+        if (!viewportState.isPanning) return;
+        viewportState.panX = e.clientX - viewportState.startX;
+        viewportState.panY = e.clientY - viewportState.startY;
+        updateViewportTransform();
+      });
+
+      window.addEventListener("mouseup", () => {
+        if (viewportState.isPanning) {
+          viewportState.isPanning = false;
+          stageArea.classList.add("stage-grab");
+          stageArea.classList.remove("stage-grabbing");
+        }
+      });
+
+      // Mouse Wheel Zoom
+      stageArea.addEventListener(
+        "wheel",
+        (e) => {
+          e.preventDefault();
+          const delta = e.deltaY < 0 ? 0.1 : -0.1;
+          zoom(delta);
+        },
+        { passive: false },
+      );
+
       // --- DOM Elements ---
       const inputTitle = document.getElementById("input-title");
       const inputPublisher = document.getElementById("input-publisher");
@@ -970,122 +1049,6 @@ Game Title</textarea
       const valOffY = document.getElementById("val-offy");
 
       const btnResetTriangle = document.getElementById("btn-reset-triangle");
-      const btnOpenSgdb = document.getElementById("btn-open-sgdb");
-      const sgdbDrawer = document.getElementById("sgdb-drawer");
-      const sgdbClose = document.getElementById("sgdb-close");
-      const sgdbApiKeyInput = document.getElementById("sgdb-api-key");
-      const sgdbSaveKey = document.getElementById("sgdb-save-key");
-      const sgdbSearchInput = document.getElementById("sgdb-search-input");
-      const sgdbSearchBtn = document.getElementById("sgdb-search-btn");
-      const sgdbResults = document.getElementById("sgdb-results");
-
-      // Load saved API key
-      const savedApiKey = localStorage.getItem("sgdb_api_key") || "";
-      sgdbApiKeyInput.value = savedApiKey;
-
-      btnOpenSgdb.addEventListener("click", () =>
-        sgdbDrawer.classList.toggle("hidden"),
-      );
-      sgdbClose.addEventListener("click", () =>
-        sgdbDrawer.classList.add("hidden"),
-      );
-      sgdbSaveKey.addEventListener("click", () => {
-        localStorage.setItem("sgdb_api_key", sgdbApiKeyInput.value.trim());
-        alert("API Key saved successfully!");
-      });
-
-      async function searchSteamGridDB() {
-        const apiKey = sgdbApiKeyInput.value.trim();
-        const query = sgdbSearchInput.value.trim();
-        if (!apiKey) {
-          alert("Please enter a SteamGridDB API key first.");
-          return;
-        }
-        if (!query) return;
-
-        sgdbResults.innerHTML =
-          '<div class="text-[11px] text-cyan-400 text-center py-4"><i class="fa-solid fa-spinner fa-spin"></i> Searching games...</div>';
-
-        try {
-          const res = await fetch(
-            `https://www.steamgriddb.com/api/v2/search/autocomplete/${encodeURIComponent(query)}`,
-            {
-              headers: { Authorization: `Bearer ${apiKey}` },
-            },
-          );
-          const data = await res.json();
-          if (!data.success || !data.data || data.data.length === 0) {
-            sgdbResults.innerHTML =
-              '<div class="text-[11px] text-slate-400 text-center py-4">No games found.</div>';
-            return;
-          }
-
-          sgdbResults.innerHTML = "";
-          data.data.forEach((game) => {
-            const item = document.createElement("div");
-            item.className =
-              "flex items-center justify-between p-2 rounded bg-slate-900 hover:bg-slate-800 cursor-pointer transition text-xs";
-            item.innerHTML = `<span>${game.name} <span class="text-[10px] text-slate-500">(${game.types?.[0] || "game"})</span></span> <span class="text-cyan-400 font-medium">Select &rarr;</span>`;
-            item.addEventListener("click", () =>
-              fetchGameLogos(game.id, game.name),
-            );
-            sgdbResults.appendChild(item);
-          });
-        } catch (err) {
-          sgdbResults.innerHTML =
-            '<div class="text-[11px] text-red-400 text-center py-4">Error fetching from SteamGridDB. Check API Key.</div>';
-        }
-      }
-
-      async function fetchGameLogos(gameId, gameName) {
-        const apiKey = sgdbApiKeyInput.value.trim();
-        sgdbResults.innerHTML = `<div class="text-[11px] text-cyan-400 text-center py-4"><i class="fa-solid fa-spinner fa-spin"></i> Fetching logos for ${gameName}...</div>`;
-
-        try {
-          // Fetch logos
-          const res = await fetch(
-            `https://www.steamgriddb.com/api/v2/logos/game/${gameId}`,
-            {
-              headers: { Authorization: `Bearer ${apiKey}` },
-            },
-          );
-          const data = await res.json();
-          if (!data.success || !data.data || data.data.length === 0) {
-            sgdbResults.innerHTML =
-              '<div class="text-[11px] text-slate-400 text-center py-4">No logos found for this game.</div>';
-            return;
-          }
-
-          sgdbResults.innerHTML = `<div class="text-[10px] text-slate-400 pb-1">Click any logo to load:</div><div class="grid grid-cols-2 gap-2"></div>`;
-          const grid = sgdbResults.querySelector(".grid");
-
-          data.data.slice(0, 8).forEach((logo) => {
-            const thumb = document.createElement("div");
-            thumb.className =
-              "bg-slate-900 rounded p-1.5 border border-slate-700 hover:border-cyan-500 cursor-pointer flex items-center justify-center h-20 transition";
-            thumb.innerHTML = `<img src="${logo.thumb}" class="max-h-full max-w-full object-contain">`;
-            thumb.addEventListener("click", () => {
-              state.customEmblemSrc = logo.url;
-              state.emblemType = "custom";
-              state.scale = 100;
-              state.rotation = 0;
-              state.offsetX = 0;
-              state.offsetY = 0;
-              renderApp();
-              sgdbDrawer.classList.add("hidden");
-            });
-            grid.appendChild(thumb);
-          });
-        } catch (err) {
-          sgdbResults.innerHTML =
-            '<div class="text-[11px] text-red-400 text-center py-4">Failed to load logos.</div>';
-        }
-      }
-
-      sgdbSearchBtn.addEventListener("click", searchSteamGridDB);
-      sgdbSearchInput.addEventListener("keydown", (e) => {
-        if (e.key === "Enter") searchSteamGridDB();
-      });
 
       // --- File Upload & Paste Handler ---
       function loadEmblemFile(file) {
@@ -1111,7 +1074,9 @@ Game Title</textarea
 
       // Global Paste Support (Ctrl+V)
       window.addEventListener("paste", (e) => {
-        const items = (e.clipboardData || e.originalEvent.clipboardData).items;
+        const items = (e.clipboardData || e.originalEvent?.clipboardData)
+          ?.items;
+        if (!items) return;
         for (const item of items) {
           if (item.type.indexOf("image") !== -1) {
             const blob = item.getAsFile();
@@ -1133,7 +1098,7 @@ Game Title</textarea
       );
       const popoverHexInput = document.getElementById("popover-hex-input");
 
-      let activeColorTarget = null; // { key, callback, swatchEl }
+      let activeColorTarget = null;
       let currentHsv = { h: 0, s: 100, v: 100 };
 
       function openColorPicker(
@@ -1147,7 +1112,6 @@ Game Title</textarea
 
         const rgb = hexToRgb(initialHex);
         const hsl = rgbToHsl(rgb.r, rgb.g, rgb.b);
-        // Convert HSL to HSV approximately for picker
         const max = Math.max(rgb.r, rgb.g, rgb.b) / 255;
         const min = Math.min(rgb.r, rgb.g, rgb.b) / 255;
         const d = max - min;
@@ -1185,12 +1149,10 @@ Game Title</textarea
         popoverHexInput.value = hex;
         popoverPreviewSwatch.style.backgroundColor = hex;
 
-        // Pure hue color for SV box background
         const pureHueRgb = hslToRgb(currentHsv.h, 100, 50);
         popoverSv.style.backgroundColor = `rgb(${pureHueRgb.r}, ${pureHueRgb.g}, ${pureHueRgb.b})`;
         popoverHue.value = currentHsv.h;
 
-        // Cursor position
         popoverSvCursor.style.left = `${currentHsv.s}%`;
         popoverSvCursor.style.top = `${100 - currentHsv.v}%`;
 
@@ -1233,7 +1195,6 @@ Game Title</textarea
         };
       }
 
-      // SV Box drag
       let isDraggingSv = false;
       popoverSv.addEventListener("mousedown", (e) => {
         isDraggingSv = true;
@@ -1269,7 +1230,6 @@ Game Title</textarea
         }
       });
 
-      // Attach swatch pickers
       swatchBg.addEventListener("click", () =>
         openColorPicker(
           "Card Background",
@@ -1355,8 +1315,10 @@ Game Title</textarea
           18.77 * scaleFactor,
         );
 
+        const activeFont = '"CustomCardFont", "Inter", sans-serif';
+
         // 3. Publisher Label
-        ctx.font = `600 ${21.33 * scaleFactor}px "Museo Sans Cyrl", "MuseoSansCyrl-900", "Inter", sans-serif`;
+        ctx.font = `600 ${21.33 * scaleFactor}px ${activeFont}`;
         ctx.fillStyle = "#999999";
         ctx.textAlign = "right";
         ctx.fillText(
@@ -1366,7 +1328,7 @@ Game Title</textarea
         );
 
         // 4. Title (Multi-line)
-        ctx.font = `700 ${48 * scaleFactor}px "Museo Sans Cyrl", "MuseoSansCyrl-900", "Inter", sans-serif`;
+        ctx.font = `700 ${48 * scaleFactor}px ${activeFont}`;
         ctx.fillStyle = "#000000";
         ctx.textAlign = "left";
         const lines = (state.title || "Game Title").split("\n");
@@ -1386,7 +1348,6 @@ Game Title</textarea
           520 * scaleFactor,
         );
 
-        // Save context for clipping center block
         ctx.save();
         ctx.beginPath();
         ctx.rect(
@@ -1452,7 +1413,7 @@ Game Title</textarea
         ctx.restore(); // Restore clip
 
         // 6. Release Year
-        ctx.font = `600 ${32 * scaleFactor}px "Museo Sans Cyrl", "MuseoSansCyrl-900", "Inter", sans-serif`;
+        ctx.font = `600 ${32 * scaleFactor}px ${activeFont}`;
         ctx.fillStyle = "#999999";
         ctx.textAlign = "right";
         ctx.fillText(
@@ -1470,7 +1431,7 @@ Game Title</textarea
           50.06 * scaleFactor,
         );
 
-        ctx.font = `700 ${32 * scaleFactor}px "Museo Sans Cyrl", "MuseoSansCyrl-900", "Inter", sans-serif`;
+        ctx.font = `700 ${32 * scaleFactor}px ${activeFont}`;
         ctx.fillStyle = "#ffffff";
         ctx.textAlign = "center";
         ctx.fillText(
@@ -1479,7 +1440,7 @@ Game Title</textarea
           (829.06 + 35) * scaleFactor,
         );
 
-        // Trigger download
+        // Download trigger
         const link = document.createElement("a");
         link.download = `${(state.title || "game").toLowerCase().replace(/\s+/g, "_")}_grid.png`;
         link.href = canvas.toDataURL("image/png");
@@ -1501,12 +1462,12 @@ Game Title</textarea
   <rect width="600" height="900" fill="${state.bgColor}"/>
   <rect x="48.8" y="32.51" width="75.12" height="18.77" fill="${state.primaryColor}"/>
   <rect x="123.91" y="32.51" width="75.12" height="18.77" fill="${state.secondaryColor}"/>
-  <text x="551.2" y="55" font-family="'Museo Sans Cyrl', sans-serif" font-weight="600" font-size="21.33" fill="#999999" text-anchor="end">${(state.publisher || "DEVELOPER").toUpperCase()}</text>
-  <text x="48.8" y="130" font-family="'Museo Sans Cyrl', sans-serif" font-weight="700" font-size="48" fill="#000000">${state.title}</text>
-  <rect x="48.8" y="203.8" width="502.4" height="550.3" fill="${state.primaryColor}" rx="4"/>
-  <text x="551.2" y="805" font-family="'Museo Sans Cyrl', sans-serif" font-weight="600" font-size="29.33" fill="#999999" text-anchor="end">/${state.year}</text>
+  <text x="551.2" y="55" font-family="'CustomCardFont', 'Inter', sans-serif" font-weight="600" font-size="21.33" fill="#999999" text-anchor="end">${(state.publisher || "DEVELOPER").toUpperCase()}</text>
+  <text x="48.8" y="130" font-family="'CustomCardFont', 'Inter', sans-serif" font-weight="700" font-size="48" fill="#000000">${state.title}</text>
+  <rect x="48.8" y="220" width="502.4" height="520" fill="${state.primaryColor}" rx="4"/>
+  <text x="551.2" y="785" font-family="'CustomCardFont', 'Inter', sans-serif" font-weight="600" font-size="32" fill="#999999" text-anchor="end">/${state.year}</text>
   <rect x="0" y="829.06" width="600" height="50.06" fill="${state.primaryColor}"/>
-  <text x="300" y="863" font-family="'Museo Sans Cyrl', sans-serif" font-weight="700" font-size="32" fill="#ffffff" text-anchor="middle">${(state.platform || "PC").toUpperCase()}</text>
+  <text x="300" y="863" font-family="'CustomCardFont', 'Inter', sans-serif" font-weight="700" font-size="32" fill="#ffffff" text-anchor="middle">${(state.platform || "PC").toUpperCase()}</text>
 </svg>`;
           const blob = new Blob([svgString], {
             type: "image/svg+xml;charset=utf-8",
@@ -1521,7 +1482,7 @@ Game Title</textarea
       // --- Font Loader & IndexedDB Persistence ---
       const DB_NAME = "SteamGridStudioDB";
       const STORE_NAME = "fonts";
-      const FONT_KEY = "museo_sans_900";
+      const FONT_KEY = "custom_card_font";
 
       function initDB() {
         return new Promise((resolve, reject) => {
@@ -1543,7 +1504,7 @@ Game Title</textarea
           const tx = db.transaction(STORE_NAME, "readwrite");
           tx.objectStore(STORE_NAME).put(arrayBuffer, FONT_KEY);
         } catch (err) {
-          console.warn("Could not cache font to IndexedDB", err);
+          // Silently ignore storage errors
         }
       }
 
@@ -1563,7 +1524,9 @@ Game Title</textarea
 
       async function applyFontArrayBuffer(arrayBuffer) {
         try {
-          const fontFace = new FontFace("Museo Sans Cyrl", arrayBuffer);
+          const fontFace = new FontFace("CustomCardFont", arrayBuffer, {
+            display: "swap",
+          });
           const loadedFace = await fontFace.load();
           document.fonts.add(loadedFace);
           document
@@ -1572,7 +1535,7 @@ Game Title</textarea
           document.getElementById("font-status-badge").innerHTML =
             '<i class="fa-solid fa-check text-emerald-400"></i> Museo Sans 900 Loaded';
         } catch (err) {
-          console.error("Failed to parse font file", err);
+          // Silently ignore
         }
       }
 
@@ -1639,7 +1602,6 @@ Game Title</textarea
           customEmblemImg.src = state.customEmblemSrc;
           if (state.tintMode === "monochrome") {
             customEmblemImg.style.filter = `drop-shadow(0px 0px 0px ${state.emblemTint})`;
-            // Apply color tint filter if supported or via CSS
             customEmblemImg.style.backgroundColor = "transparent";
           } else {
             customEmblemImg.style.filter = "none";
