@@ -1,0 +1,1046 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Steam Grid Card Studio</title>
+  <!-- Tailwind CSS -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <!-- FontAwesome Icons -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
+    body { font-family: 'Inter', sans-serif; }
+    
+    ::-webkit-scrollbar { width: 6px; height: 6px; }
+    ::-webkit-scrollbar-track { background: #090d16; }
+    ::-webkit-scrollbar-thumb { background: #1e293b; border-radius: 3px; }
+    ::-webkit-scrollbar-thumb:hover { background: #334155; }
+    
+    .color-swatch-btn {
+      width: 32px;
+      height: 32px;
+      border-radius: 6px;
+      border: 2px solid rgba(255,255,255,0.15);
+      cursor: pointer;
+      transition: transform 0.1s ease, border-color 0.1s ease;
+      position: relative;
+    }
+    .color-swatch-btn:hover {
+      transform: scale(1.08);
+      border-color: rgba(255,255,255,0.4);
+    }
+
+    #color-picker-popover {
+      box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.5), 0 8px 10px -6px rgba(0, 0, 0, 0.5);
+      z-index: 9999;
+    }
+  </style>
+</head>
+<body class="bg-slate-950 text-slate-100 min-h-screen flex flex-col antialiased selection:bg-cyan-500 selection:text-white">
+
+  <!-- Header Bar -->
+  <header class="bg-slate-900 border-b border-slate-800 px-6 py-3 flex items-center justify-between flex-shrink-0">
+    <div class="flex items-center gap-3">
+      <div class="w-9 h-9 rounded-lg bg-gradient-to-br from-cyan-500 to-indigo-600 flex items-center justify-center shadow-lg shadow-cyan-500/20">
+        <i class="fa-solid fa-layer-group text-white text-sm"></i>
+      </div>
+      <div>
+        <h1 class="text-sm font-bold tracking-tight text-white">Steam Grid Card Studio</h1>
+        <p class="text-[11px] text-slate-400">Minimalist Swiss Poster & Series Generator</p>
+      </div>
+    </div>
+    
+    <div class="flex items-center gap-3">
+      <div id="font-status-badge" class="hidden sm:flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-emerald-950/80 border border-emerald-800/60 text-emerald-300 text-[11px] font-medium">
+        <i class="fa-solid fa-check text-emerald-400"></i> Museo Sans 900 Loaded
+      </div>
+      <label class="cursor-pointer bg-slate-800 hover:bg-slate-700 text-slate-200 border border-slate-700 px-3 py-1.5 rounded-lg text-xs font-medium flex items-center gap-2 transition shadow-sm">
+        <i class="fa-solid fa-font text-cyan-400"></i> Load Museo Sans Font (.ttf)
+        <input type="file" id="font-file-input" accept=".ttf,.otf,.woff,.woff2" class="hidden">
+      </label>
+    </div>
+  </header>
+
+  <!-- Main Studio Workspace -->
+  <main class="flex-1 flex flex-col lg:flex-row overflow-hidden relative" id="main-workspace">
+
+    <!-- Left Sidebar: Controls -->
+    <aside class="w-full lg:w-[420px] bg-slate-900/95 border-r border-slate-800 flex flex-col flex-shrink-0 z-20 overflow-y-auto">
+      <div class="p-5 space-y-6">
+
+        <!-- 1. Typography & Content -->
+        <section class="space-y-3">
+          <h2 class="text-xs font-semibold uppercase tracking-wider text-slate-400 flex items-center gap-1.5">
+            <i class="fa-solid fa-pen-nib text-cyan-400"></i> Typography & Content
+          </h2>
+          <div class="space-y-3 bg-slate-950/70 p-3 rounded-lg border border-slate-800">
+            <div>
+              <label class="block text-[11px] font-medium text-slate-300 mb-1">Game Title (Multi-line supported)</label>
+              <textarea id="input-title" rows="2" class="w-full bg-slate-900 border border-slate-700 rounded-lg px-3 py-2 text-xs text-white focus:outline-none focus:border-cyan-500 font-bold resize-none">Game Title</textarea>
+            </div>
+            <div class="grid grid-cols-2 gap-2">
+              <div>
+                <label class="block text-[11px] font-medium text-slate-300 mb-1">Developer / Publisher</label>
+                <input type="text" id="input-publisher" value="Developer" class="w-full bg-slate-900 border border-slate-700 rounded-lg px-3 py-2 text-xs text-white uppercase focus:outline-none focus:border-cyan-500">
+              </div>
+              <div>
+                <label class="block text-[11px] font-medium text-slate-300 mb-1">Release Year</label>
+                <div class="relative flex items-center">
+                  <span class="absolute left-3 text-xs text-slate-400 font-mono select-none">/</span>
+                  <input type="text" id="input-year" value="2024" class="w-full bg-slate-900 border border-slate-700 rounded-lg pl-7 pr-3 py-2 text-xs text-white font-mono focus:outline-none focus:border-cyan-500">
+                </div>
+              </div>
+            </div>
+            <div>
+              <label class="block text-[11px] font-medium text-slate-300 mb-1">Platform Footer Label</label>
+              <input type="text" id="input-platform" value="PC" class="w-full bg-slate-950 border border-slate-700 rounded-lg px-3 py-2 text-xs text-white uppercase font-bold tracking-wider text-center focus:outline-none focus:border-cyan-500">
+            </div>
+          </div>
+        </section>
+
+        <!-- Divider -->
+        <div class="border-t border-slate-800"></div>
+
+        <!-- 2. Color Palette & Series Progression -->
+        <section class="space-y-3">
+          <div class="flex items-center justify-between">
+            <h2 class="text-xs font-semibold uppercase tracking-wider text-slate-400 flex items-center gap-1.5">
+              <i class="fa-solid fa-palette text-indigo-400"></i> Color Palette & Progression
+            </h2>
+            <button id="btn-toggle-midpoint" class="text-[11px] text-cyan-400 hover:text-cyan-300 font-medium flex items-center gap-1">
+              <i class="fa-solid fa-calculator"></i> Series Midpoint Calculator
+            </button>
+          </div>
+
+          <!-- Midpoint Calculator Drawer -->
+          <div id="midpoint-drawer" class="hidden p-3 rounded-lg bg-slate-950 border border-slate-800 space-y-2.5">
+            <div class="text-[11px] text-slate-300 font-medium">Calculate exact midpoint between two colors:</div>
+            <div class="grid grid-cols-2 gap-2">
+              <div>
+                <label class="block text-[10px] text-slate-400 mb-0.5">Color A</label>
+                <div class="flex items-center gap-1.5">
+                  <button class="color-swatch-btn !w-6 !h-6" id="mp-color-a" style="background-color: #00ac9c;"></button>
+                  <input type="text" id="mp-hex-a" value="#00ac9c" class="w-full bg-slate-900 border border-slate-700 rounded px-1.5 py-1 text-[11px] font-mono text-white">
+                </div>
+              </div>
+              <div>
+                <label class="block text-[10px] text-slate-400 mb-0.5">Color B</label>
+                <div class="flex items-center gap-1.5">
+                  <button class="color-swatch-btn !w-6 !h-6" id="mp-color-b" style="background-color: #8c94df;"></button>
+                  <input type="text" id="mp-hex-b" value="#8c94df" class="w-full bg-slate-900 border border-slate-700 rounded px-1.5 py-1 text-[11px] font-mono text-white">
+                </div>
+              </div>
+            </div>
+            <div class="grid grid-cols-2 gap-2 pt-1">
+              <button id="btn-apply-hsl-mid" class="bg-cyan-950 hover:bg-cyan-900 text-cyan-300 border border-cyan-800/80 rounded py-1 px-2 text-[11px] font-medium transition">
+                Apply HSL Wheel Midpoint
+              </button>
+              <button id="btn-apply-rgb-mid" class="bg-slate-800 hover:bg-slate-700 text-slate-200 border border-slate-700 rounded py-1 px-2 text-[11px] font-medium transition">
+                Apply RGB Math Midpoint
+              </button>
+            </div>
+          </div>
+
+          <!-- Color Pickers -->
+          <div class="space-y-3 pt-1">
+            <!-- Background Card Color -->
+            <div class="flex items-center justify-between bg-slate-950/60 p-2.5 rounded-lg border border-slate-800/80">
+              <div>
+                <div class="text-xs font-medium text-white">Card Background</div>
+                <div class="text-[10px] text-slate-400">Swiss parchment base tone</div>
+              </div>
+              <div class="flex items-center gap-2">
+                <button id="swatch-bg" class="color-swatch-btn" style="background-color: #eeeade;"></button>
+                <input type="text" id="input-bg-hex" value="#eeeade" class="w-20 bg-slate-900 border border-slate-700 rounded px-2 py-1 text-xs font-mono text-white text-center">
+              </div>
+            </div>
+
+            <!-- Primary Accent (Left Top Bar & Footer) -->
+            <div class="flex items-center justify-between bg-slate-950/60 p-2.5 rounded-lg border border-slate-800/80">
+              <div>
+                <div class="text-xs font-medium text-white">Primary Accent (Lighter)</div>
+                <div class="text-[10px] text-slate-400">Left top bar & platform footer</div>
+              </div>
+              <div class="flex items-center gap-2">
+                <button id="swatch-primary" class="color-swatch-btn" style="background-color: #00ac9c;"></button>
+                <input type="text" id="input-primary-hex" value="#00ac9c" class="w-20 bg-slate-900 border border-slate-700 rounded px-2 py-1 text-xs font-mono text-white text-center">
+              </div>
+            </div>
+
+            <!-- Secondary Accent (Right Top Bar) -->
+            <div class="flex items-center justify-between bg-slate-950/60 p-2.5 rounded-lg border border-slate-800/80">
+              <div class="flex-1">
+                <div class="flex items-center gap-2">
+                  <span class="text-xs font-medium text-white">Secondary Accent</span>
+                  <span id="secondary-status-badge" class="text-[9px] font-bold px-1.5 py-0.5 rounded uppercase tracking-wider bg-cyan-950 text-cyan-300 border border-cyan-800">Auto (-16.5% L)</span>
+                </div>
+                <div class="text-[10px] text-slate-400">Right top bar shade</div>
+              </div>
+              <div class="flex items-center gap-2">
+                <button id="btn-resync-secondary" title="Re-sync Auto Match" class="hidden text-xs text-cyan-400 hover:text-cyan-300 p-1">
+                  <i class="fa-solid fa-rotate"></i>
+                </button>
+                <button id="swatch-secondary" class="color-swatch-btn" style="background-color: #007471;"></button>
+                <input type="text" id="input-secondary-hex" value="#007471" class="w-20 bg-slate-900 border border-slate-700 rounded px-2 py-1 text-xs font-mono text-white text-center">
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <!-- Divider -->
+        <div class="border-t border-slate-800"></div>
+
+        <!-- 3. Center Emblem / Artwork -->
+        <section class="space-y-3">
+          <div class="flex items-center justify-between">
+            <h2 class="text-xs font-semibold uppercase tracking-wider text-slate-400 flex items-center gap-1.5">
+              <i class="fa-solid fa-vector-square text-emerald-400"></i> Center Emblem
+            </h2>
+            <div class="flex items-center gap-2">
+              <button id="btn-reset-triangle" class="text-[11px] text-cyan-400 hover:text-cyan-300 font-medium flex items-center gap-1">
+                <i class="fa-solid fa-rotate-left"></i> Reset
+              </button>
+            </div>
+          </div>
+
+          <!-- File Upload Box / Drag & Drop -->
+          </div>
+
+          <!-- File Upload Box -->
+          <div id="dropzone" class="border-2 border-dashed border-slate-700 hover:border-cyan-500 rounded-xl p-4 text-center cursor-pointer transition bg-slate-950/50 group">
+            <input type="file" id="file-upload" accept="image/*,.svg" class="hidden">
+            <div class="flex flex-col items-center justify-center space-y-1.5">
+              <div class="w-9 h-9 rounded-full bg-slate-800 group-hover:bg-cyan-950/80 flex items-center justify-center transition">
+                <i class="fa-solid fa-cloud-arrow-up text-slate-400 group-hover:text-cyan-400 text-sm transition"></i>
+              </div>
+              <div class="text-xs font-medium text-slate-200">Click to upload logo or paste (<span class="font-mono text-cyan-400">Ctrl+V</span>)</div>
+              <div class="text-[10px] text-slate-400">Supports SVG, PNG, JPG, WebP</div>
+            </div>
+          </div>
+
+          <!-- Emblem Transform & Color Tints -->
+          <div class="space-y-3 bg-slate-950/70 p-3 rounded-lg border border-slate-800">
+            <div class="flex items-center justify-between">
+              <label class="text-xs font-medium text-slate-300">Emblem Tint Mode</label>
+              <div class="flex items-center gap-1 bg-slate-900 p-0.5 rounded-lg border border-slate-700 text-[11px]">
+                <button id="tint-mode-monochrome" class="px-2 py-1 rounded bg-cyan-600 text-white font-medium transition">Monochrome</button>
+                <button id="tint-mode-original" class="px-2 py-1 rounded text-slate-400 hover:text-white transition">Original Colors</button>
+              </div>
+            </div>
+
+            <div id="monochrome-tint-controls" class="space-y-2 pt-1">
+              <div class="flex items-center gap-2">
+                <button id="swatch-emblem-tint" class="color-swatch-btn !w-7 !h-7 flex-shrink-0" style="background-color: #ffffff;"></button>
+                <input type="text" id="emblem-tint-text" value="#ffffff" class="flex-1 bg-slate-900 border border-slate-700 rounded px-2 py-1 text-xs font-mono text-white">
+                <button id="btn-tint-white" class="px-2 py-1 rounded bg-slate-800 hover:bg-slate-700 text-xs text-slate-200 font-medium">White</button>
+                <button id="btn-tint-dark" class="px-2 py-1 rounded bg-slate-800 hover:bg-slate-700 text-xs text-slate-200 font-medium">Dark</button>
+              </div>
+            </div>
+
+            <!-- Position & Scale -->
+            <div class="grid grid-cols-2 gap-2 text-xs pt-1">
+              <div>
+                <div class="flex justify-between text-[11px] text-slate-400 mb-1">
+                  <span>Scale</span>
+                  <span id="val-scale">100%</span>
+                </div>
+                <input type="range" id="emblem-scale" min="20" max="180" value="100" class="w-full accent-cyan-500">
+              </div>
+              <div>
+                <div class="flex justify-between text-[11px] text-slate-400 mb-1">
+                  <span>Rotation</span>
+                  <span id="val-rot">0°</span>
+                </div>
+                <input type="range" id="emblem-rot" min="-180" max="180" value="0" class="w-full accent-cyan-500">
+              </div>
+              <div>
+                <div class="flex justify-between text-[11px] text-slate-400 mb-1">
+                  <span>Offset X</span>
+                  <span id="val-offx">0 px</span>
+                </div>
+                <input type="range" id="emblem-offx" min="-150" max="150" value="0" class="w-full accent-cyan-500">
+              </div>
+              <div>
+                <div class="flex justify-between text-[11px] text-slate-400 mb-1">
+                  <span>Offset Y</span>
+                  <span id="val-offy">0 px</span>
+                </div>
+                <input type="range" id="emblem-offy" min="-150" max="150" value="0" class="w-full accent-cyan-500">
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <!-- Divider -->
+        <div class="border-t border-slate-800"></div>
+
+        <!-- 4. Export Suite -->
+        <section class="space-y-3 pb-4">
+          <h2 class="text-xs font-semibold uppercase tracking-wider text-slate-400 flex items-center gap-1.5">
+            <i class="fa-solid fa-download text-amber-400"></i> Export Suite
+          </h2>
+          <div class="grid grid-cols-3 gap-2">
+            <button id="btn-export-png" class="bg-cyan-600 hover:bg-cyan-500 text-white font-medium py-2 px-2 rounded-lg text-xs flex flex-col items-center justify-center gap-1 transition shadow-lg shadow-cyan-600/20">
+              <i class="fa-solid fa-file-image"></i> PNG 600x900
+            </button>
+            <button id="btn-export-hd" class="bg-indigo-600 hover:bg-indigo-500 text-white font-medium py-2 px-2 rounded-lg text-xs flex flex-col items-center justify-center gap-1 transition shadow-lg shadow-indigo-600/20">
+              <i class="fa-solid fa-wand-magic-sparkles"></i> HD 1200x1800
+            </button>
+            <button id="btn-export-svg" class="bg-slate-800 hover:bg-slate-700 text-slate-200 border border-slate-700 font-medium py-2 px-2 rounded-lg text-xs flex flex-col items-center justify-center gap-1 transition">
+              <i class="fa-solid fa-code"></i> SVG
+            </button>
+          </div>
+        </section>
+
+      </div>
+    </aside>
+
+    <!-- Right Stage: Live Interactive Card Preview -->
+    <section class="flex-1 bg-slate-950 flex flex-col items-center justify-center p-6 relative overflow-hidden" id="stage-area">
+      
+      <!-- Card Viewport Container -->
+      <div id="card-viewport" class="relative shadow-2xl rounded-sm transition-all duration-300 flex items-center justify-center select-none" style="width: 400px; height: 600px;">
+        
+        <!-- The Actual 600x900 SVG / HTML Canvas Master Card -->
+        <div id="card-root" class="absolute w-[600px] h-[900px] origin-top-left transform scale-[0.666666] select-none" style="background-color: #eeeade;">
+          
+          <!-- 1. Top Accent Bars (Exact SVG Coordinates) -->
+          <!-- Left Bar (Primary Accent / Lighter) -->
+          <div id="node-bar-left" class="absolute" style="left: 48.8px; top: 32.51px; width: 75.12px; height: 18.77px; background-color: #00ac9c;"></div>
+          <!-- Right Bar (Secondary Accent / Darker) -->
+          <div id="node-bar-right" class="absolute" style="left: 123.91px; top: 32.51px; width: 75.12px; height: 18.77px; background-color: #007471;"></div>
+
+          <!-- 2. Publisher Label -->
+          <div id="node-publisher" class="absolute font-semibold tracking-wide uppercase" style="right: 48.8px; top: 36.67px; font-size: 21.33px; color: #999999; font-family: 'Museo Sans Cyrl', 'MuseoSansCyrl-900', 'Inter', sans-serif;">DEVELOPER</div>
+
+          <!-- 3. Title (Multi-line) -->
+          <div id="node-title-container" class="absolute font-bold tracking-tight" style="left: 48.8px; top: 92.77px; width: 502.4px; line-height: 1.08; font-size: 48px; color: #000000; font-family: 'Museo Sans Cyrl', 'MuseoSansCyrl-900', 'Inter', sans-serif;">
+            Game Title
+          </div>
+
+          <!-- 4. Center Graphic Block (x: 48.8px, y: 220px, w: 502.4px, h: 520px) -->
+          <div id="node-center-block" class="absolute rounded overflow-hidden cursor-pointer group" style="left: 48.8px; top: 220px; width: 502.4px; height: 520px; background-color: #00ac9c;" title="Click to upload emblem">
+            <div id="emblem-container" class="w-full h-full flex items-center justify-center relative overflow-visible">
+              <!-- Default Triangle SVG -->
+              <svg id="default-emblem-svg" viewBox="0 0 512 512" class="w-3/4 h-3/4 drop-shadow-md transition-all">
+                <polygon points="256,64 480,448 32,448" fill="#ffffff" />
+              </svg>
+              <!-- Custom Emblem Image/SVG -->
+              <img id="custom-emblem-img" class="hidden max-w-none transition-all object-contain" alt="Emblem">
+            </div>
+            <!-- Hover overlay -->
+            <div class="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center pointer-events-none">
+              <span class="bg-slate-900/90 text-white text-xs px-3 py-1.5 rounded-lg font-medium shadow-lg border border-slate-700 flex items-center gap-1.5">
+                <i class="fa-solid fa-cloud-arrow-up text-cyan-400"></i> Click or Paste Logo
+              </span>
+            </div>
+          </div>
+
+          <!-- 5. Release Year (Positioned in bottom-right below center block) -->
+          <div id="node-year" class="absolute font-semibold tracking-wider text-right" style="right: 48.8px; top: 760px; font-size: 32px; color: #999999; font-family: 'Museo Sans Cyrl', 'MuseoSansCyrl-900', 'Inter', sans-serif;">/2024</div>
+
+          <!-- 6. Platform Footer Bar -->
+          <div id="node-footer-bar" class="absolute flex items-center justify-center" style="left: 0px; top: 829.06px; width: 600px; height: 50.06px; background-color: #00ac9c;">
+            <div id="node-footer-text" class="uppercase font-bold tracking-widest text-white" style="font-size: 32px; font-family: 'Museo Sans Cyrl', 'MuseoSansCyrl-900', 'Inter', sans-serif;">PC</div>
+          </div>
+
+        </div>
+      </div>
+
+      <!-- Stage Footer Hint -->
+      <div class="absolute bottom-4 text-[11px] text-slate-500 font-medium">
+        Steam Grid Art Format (600 × 900 px) · Paste <span class="text-cyan-400 font-mono">Ctrl+V</span> anywhere to add logos
+      </div>
+    </section>
+
+  </main>
+
+  <!-- Modern In-App Color Picker Popover -->
+  <div id="color-picker-popover" class="hidden absolute bg-slate-900 border border-slate-700 rounded-xl p-3.5 w-64 space-y-3 z-50">
+    <div class="flex items-center justify-between pb-2 border-b border-slate-800">
+      <span class="text-xs font-semibold text-white" id="popover-title">Select Color</span>
+      <button id="popover-close-btn" class="text-slate-400 hover:text-white text-xs"><i class="fa-solid fa-xmark"></i></button>
+    </div>
+    <!-- SV Box -->
+    <div id="popover-sv" class="relative w-full h-36 rounded-lg cursor-crosshair overflow-hidden" style="background: rgb(255, 0, 0);">
+      <div class="absolute inset-0" style="background: linear-gradient(to right, #fff, rgba(255,255,255,0));"></div>
+      <div class="absolute inset-0" style="background: linear-gradient(to top, #000, rgba(0,0,0,0));"></div>
+      <div id="popover-sv-cursor" class="absolute w-3.5 h-3.5 rounded-full border-2 border-white shadow-md transform -translate-x-1/2 -translate-y-1/2 pointer-events-none" style="left: 100%; top: 0%;"></div>
+    </div>
+    <!-- Hue Slider -->
+    <div class="relative w-full h-4 rounded-lg overflow-hidden cursor-pointer" style="background: linear-gradient(to right, #ff0000 0%, #ffff00 17%, #00ff00 33%, #00ffff 50%, #0000ff 67%, #ff00ff 83%, #ff0000 100%);">
+      <input type="range" id="popover-hue" min="0" max="360" value="0" class="absolute inset-0 w-full h-full opacity-0 cursor-pointer">
+    </div>
+    <!-- Hex & Preview -->
+    <div class="flex items-center gap-2">
+      <div id="popover-preview-swatch" class="w-8 h-8 rounded-lg border border-slate-600 flex-shrink-0"></div>
+      <input type="text" id="popover-hex-input" class="w-full bg-slate-950 border border-slate-700 rounded-lg px-2.5 py-1.5 text-xs font-mono text-white text-center uppercase">
+    </div>
+  </div>
+
+  <!-- Hidden Canvas for Exporting -->
+  <canvas id="export-canvas" width="600" height="900" class="hidden"></canvas>
+
+  <!-- JavaScript Studio Engine -->
+  <script>
+    // --- State Management ---
+    const state = {
+      title: "Game Title",
+      publisher: "DEVELOPER",
+      year: "2024",
+      platform: "PC",
+      bgColor: "#eeeade",
+      primaryColor: "#00ac9c",
+      secondaryColor: "#007471",
+      secondaryAuto: true,
+      emblemType: 'triangle', // 'triangle' | 'custom'
+      customEmblemSrc: null,
+      emblemName: 'Triangle',
+      tintMode: 'monochrome', // 'monochrome' | 'original'
+      emblemTint: '#ffffff',
+      scale: 100,
+      rotation: 0,
+      offsetX: 0,
+      offsetY: 0
+    };
+
+    // --- DOM Elements ---
+    const inputTitle = document.getElementById('input-title');
+    const inputPublisher = document.getElementById('input-publisher');
+    const inputYear = document.getElementById('input-year');
+    const inputPlatform = document.getElementById('input-platform');
+    
+    const inputBgHex = document.getElementById('input-bg-hex');
+    const swatchBg = document.getElementById('swatch-bg');
+    const inputPrimaryHex = document.getElementById('input-primary-hex');
+    const swatchPrimary = document.getElementById('swatch-primary');
+    const inputSecondaryHex = document.getElementById('input-secondary-hex');
+    const swatchSecondary = document.getElementById('swatch-secondary');
+    const secondaryStatusBadge = document.getElementById('secondary-status-badge');
+    const btnResyncSecondary = document.getElementById('btn-resync-secondary');
+
+    const dropzone = document.getElementById('dropzone');
+    const fileUpload = document.getElementById('file-upload');
+    const centerBlock = document.getElementById('node-center-block');
+    const defaultEmblemSvg = document.getElementById('default-emblem-svg');
+    const customEmblemImg = document.getElementById('custom-emblem-img');
+    const emblemContainer = document.getElementById('emblem-container');
+
+    const tintModeMonochrome = document.getElementById('tint-mode-monochrome');
+    const tintModeOriginal = document.getElementById('tint-mode-original');
+    const monochromeControls = document.getElementById('monochrome-tint-controls');
+    const swatchEmblemTint = document.getElementById('swatch-emblem-tint');
+    const emblemTintText = document.getElementById('emblem-tint-text');
+    const btnTintWhite = document.getElementById('btn-tint-white');
+    const btnTintDark = document.getElementById('btn-tint-dark');
+
+    const sliderScale = document.getElementById('emblem-scale');
+    const valScale = document.getElementById('val-scale');
+    const sliderRot = document.getElementById('emblem-rot');
+    const valRot = document.getElementById('val-rot');
+    const sliderOffX = document.getElementById('emblem-offx');
+    const valOffX = document.getElementById('val-offx');
+    const sliderOffY = document.getElementById('emblem-offy');
+    const valOffY = document.getElementById('val-offy');
+
+    const btnResetTriangle = document.getElementById('btn-reset-triangle');
+
+    // --- Color Math Helpers ---
+    function hexToRgb(hex) {
+      let c = hex.replace('#', '');
+      if (c.length === 3) c = c.split('').map(x => x + x).join('');
+      const num = parseInt(c, 16);
+      return { r: (num >> 16) & 255, g: (num >> 8) & 255, b: num & 255 };
+    }
+
+    function rgbToHex(r, g, b) {
+      return '#' + [r, g, b].map(x => {
+        const hex = Math.round(Math.max(0, Math.min(255, x))).toString(16);
+        return hex.length === 1 ? '0' + hex : hex;
+      }).join('');
+    }
+
+    function rgbToHsl(r, g, b) {
+      r /= 255; g /= 255; b /= 255;
+      const max = Math.max(r, g, b), min = Math.min(r, g, b);
+      let h, s, l = (max + min) / 2;
+      if (max === min) {
+        h = s = 0;
+      } else {
+        const d = max - min;
+        s = l > 0.5 ? d / (2 - max - min) : d / (max + min);
+        switch (max) {
+          case r: h = (g - b) / d + (g < b ? 6 : 0); break;
+          case g: h = (b - r) / d + 2; break;
+          case b: h = (r - g) / d + 4; break;
+        }
+        h /= 6;
+      }
+      return { h: h * 360, s: s * 100, l: l * 100 };
+    }
+
+    function hslToRgb(h, s, l) {
+      h /= 360; s /= 100; l /= 100;
+      let r, g, b;
+      if (s === 0) {
+        r = g = b = l;
+      } else {
+        const hue2rgb = (p, q, t) => {
+          if (t < 0) t += 1;
+          if (t > 1) t -= 1;
+          if (t < 1/6) return p + (q - p) * 6 * t;
+          if (t < 1/2) return q;
+          if (t < 2/3) return p + (q - p) * (2/3 - t) * 6;
+          return p;
+        };
+        const q = l < 0.5 ? l * (1 + s) : l + s - l * s;
+        const p = 2 * l - q;
+        r = hue2rgb(p, q, h + 1/3);
+        g = hue2rgb(p, q, h);
+        b = hue2rgb(p, q, h - 1/3);
+      }
+      return { r: Math.round(r * 255), g: Math.round(g * 255), b: Math.round(b * 255) };
+    }
+
+    function calculateAutoSecondary(primaryHex) {
+      const rgb = hexToRgb(primaryHex);
+      const hsl = rgbToHsl(rgb.r, rgb.g, rgb.b);
+      // Reduce lightness by 16.5% for secondary accent
+      let newL = Math.max(5, hsl.l - 16.5);
+      const newRgb = hslToRgb(hsl.h, hsl.s, newL);
+      return rgbToHex(newRgb.r, newRgb.g, newRgb.b);
+    }
+
+    // --- Render App View ---
+    function renderApp() {
+      // Typography
+      document.getElementById('node-title-container').innerText = state.title || 'Game Title';
+      document.getElementById('node-publisher').innerText = state.publisher || 'DEVELOPER';
+      document.getElementById('node-year').innerText = '/' + (state.year || '2024');
+      document.getElementById('node-footer-text').innerText = state.platform || 'PC';
+
+      // Colors
+      document.getElementById('card-root').style.backgroundColor = state.bgColor;
+      swatchBg.style.backgroundColor = state.bgColor;
+      inputBgHex.value = state.bgColor;
+
+      document.getElementById('node-bar-left').style.backgroundColor = state.primaryColor;
+      document.getElementById('node-footer-bar').style.backgroundColor = state.primaryColor;
+      swatchPrimary.style.backgroundColor = state.primaryColor;
+      inputPrimaryHex.value = state.primaryColor;
+
+      document.getElementById('node-bar-right').style.backgroundColor = state.secondaryColor;
+      swatchSecondary.style.backgroundColor = state.secondaryColor;
+      inputSecondaryHex.value = state.secondaryColor;
+
+      // Center block bg sync
+      document.getElementById('node-center-block').style.backgroundColor = state.primaryColor;
+
+      // Secondary Badge status
+      if (state.secondaryAuto) {
+        secondaryStatusBadge.textContent = "Auto (-16.5% L)";
+        secondaryStatusBadge.className = "text-[9px] font-bold px-1.5 py-0.5 rounded uppercase tracking-wider bg-cyan-950 text-cyan-300 border border-cyan-800";
+        btnResyncSecondary.classList.add('hidden');
+      } else {
+        secondaryStatusBadge.textContent = "Manual";
+        secondaryStatusBadge.className = "text-[9px] font-bold px-1.5 py-0.5 rounded uppercase tracking-wider bg-amber-950 text-amber-300 border border-amber-800";
+        btnResyncSecondary.classList.remove('hidden');
+      }
+
+      // Emblem Type & Visibility
+      if (state.emblemType === 'triangle') {
+        defaultEmblemSvg.classList.remove('hidden');
+        customEmblemImg.classList.add('hidden');
+        if (state.tintMode === 'monochrome') {
+          defaultEmblemSvg.querySelector('polygon').setAttribute('fill', state.emblemTint);
+          defaultEmblemSvg.style.filter = 'none';
+        } else {
+          defaultEmblemSvg.querySelector('polygon').setAttribute('fill', '#ffffff');
+          defaultEmblemSvg.style.filter = 'none';
+        }
+      } else {
+        defaultEmblemSvg.classList.add('hidden');
+        customEmblemImg.classList.remove('hidden');
+        customEmblemImg.src = state.customEmblemSrc;
+
+        if (state.tintMode === 'monochrome') {
+          // Convert hex color to CSS filter for <img> element
+          customEmblemImg.style.filter = getCssFilterForColor(state.emblemTint);
+        } else {
+          customEmblemImg.style.filter = 'none';
+        }
+      }
+
+      // Emblem Transforms
+      customEmblemImg.style.transform = `translate(${state.offsetX}px, ${state.offsetY}px) scale(${state.scale / 100}) rotate(${state.rotation}deg)`;
+      defaultEmblemSvg.style.transform = `translate(${state.offsetX}px, ${state.offsetY}px) scale(${state.scale / 100}) rotate(${state.rotation}deg)`;
+
+      // Tint Mode UI
+      if (state.tintMode === 'monochrome') {
+        tintModeMonochrome.className = "px-2 py-1 rounded bg-cyan-600 text-white font-medium transition";
+        tintModeOriginal.className = "px-2 py-1 rounded text-slate-400 hover:text-white transition";
+        monochromeControls.classList.remove('hidden');
+        swatchEmblemTint.style.backgroundColor = state.emblemTint;
+        emblemTintText.value = state.emblemTint;
+      } else {
+        tintModeMonochrome.className = "px-2 py-1 rounded text-slate-400 hover:text-white transition";
+        tintModeOriginal.className = "px-2 py-1 rounded bg-cyan-600 text-white font-medium transition";
+        monochromeControls.classList.add('hidden');
+      }
+
+      // Sliders UI
+      valScale.innerText = state.scale + '%';
+      sliderScale.value = state.scale;
+      valRot.innerText = state.rotation + '°';
+      sliderRot.value = state.rotation;
+      valOffX.innerText = state.offsetX + ' px';
+      sliderOffX.value = state.offsetX;
+      valOffY.innerText = state.offsetY + ' px';
+      sliderOffY.value = state.offsetY;
+    }
+
+    // Helper to generate CSS filter from hex color for <img> tags
+    function getCssFilterForColor(hex) {
+      if (hex.toLowerCase() === '#ffffff') {
+        return 'brightness(0) invert(1)';
+      }
+      if (hex.toLowerCase() === '#000000' || hex.toLowerCase() === '#090d16') {
+        return 'brightness(0)';
+      }
+      // For general colors, approximate using sepia/saturate/hue-rotate or brightness
+      // A reliable fallback for custom colors:
+      const rgb = hexToRgb(hex);
+      const hsl = rgbToHsl(rgb.r, rgb.g, rgb.b);
+      // We can use brightness + sepia + hue-rotate + saturate approximation,
+      // or for simplicity, if it's pure white/black, we use invert. For custom color tinting on transparent PNGs,
+      // CSS drop-shadow or brightness/contrast. Let's use brightness + hue-rotate approximation or drop-shadow.
+      return `brightness(0) saturate(100%) invert(%) sepia(100%) saturate(1000%) hue-rotate(${hsl.h}deg) brightness(${hsl.l}%)`;
+    }
+
+    // --- Input Listeners ---
+    inputTitle.addEventListener('input', (e) => { state.title = e.target.value; renderApp(); });
+    inputPublisher.addEventListener('input', (e) => { state.publisher = e.target.value; renderApp(); });
+    inputYear.addEventListener('input', (e) => { state.year = e.target.value.replace(/^\/+/, ''); renderApp(); });
+    inputPlatform.addEventListener('input', (e) => { state.platform = e.target.value; renderApp(); });
+
+    inputBgHex.addEventListener('input', (e) => { state.bgColor = e.target.value; renderApp(); });
+    inputPrimaryHex.addEventListener('input', (e) => {
+      state.primaryColor = e.target.value;
+      if (state.secondaryAuto) {
+        state.secondaryColor = calculateAutoSecondary(state.primaryColor);
+      }
+      renderApp();
+    });
+    inputSecondaryHex.addEventListener('input', (e) => {
+      state.secondaryColor = e.target.value;
+      state.secondaryAuto = false;
+      renderApp();
+    });
+    btnResyncSecondary.addEventListener('click', () => {
+      state.secondaryAuto = true;
+      state.secondaryColor = calculateAutoSecondary(state.primaryColor);
+      renderApp();
+    });
+
+    tintModeMonochrome.addEventListener('click', () => { state.tintMode = 'monochrome'; renderApp(); });
+    tintModeOriginal.addEventListener('click', () => { state.tintMode = 'original'; renderApp(); });
+    btnTintWhite.addEventListener('click', () => { state.emblemTint = '#ffffff'; renderApp(); });
+    btnTintDark.addEventListener('click', () => { state.emblemTint = '#1e293b'; renderApp(); });
+    emblemTintText.addEventListener('input', (e) => { state.emblemTint = e.target.value; renderApp(); });
+
+    sliderScale.addEventListener('input', (e) => { state.scale = parseInt(e.target.value); renderApp(); });
+    sliderRot.addEventListener('input', (e) => { state.rotation = parseInt(e.target.value); renderApp(); });
+    sliderOffX.addEventListener('input', (e) => { state.offsetX = parseInt(e.target.value); renderApp(); });
+    sliderOffY.addEventListener('input', (e) => { state.offsetY = parseInt(e.target.value); renderApp(); });
+
+    btnResetTriangle.addEventListener('click', () => {
+      state.emblemType = 'triangle';
+      state.scale = 100; state.rotation = 0; state.offsetX = 0; state.offsetY = 0;
+      renderApp();
+    });
+
+    // --- File Upload & Paste Handler ---
+    function loadEmblemFile(file) {
+      if (!file) return;
+      const reader = new FileReader();
+      reader.onload = (e) => {
+        state.customEmblemSrc = e.target.result;
+        state.emblemType = 'custom';
+        state.scale = 100; state.rotation = 0; state.offsetX = 0; state.offsetY = 0;
+        renderApp();
+      };
+      reader.readAsDataURL(file);
+    }
+
+    dropzone.addEventListener('click', () => fileUpload.click());
+    centerBlock.addEventListener('click', () => fileUpload.click());
+    fileUpload.addEventListener('change', (e) => {
+      if (e.target.files[0]) loadEmblemFile(e.target.files[0]);
+    });
+
+    // Global Paste Support (Ctrl+V)
+    window.addEventListener('paste', (e) => {
+      const items = (e.clipboardData || e.originalEvent.clipboardData).items;
+      for (const item of items) {
+        if (item.type.indexOf('image') !== -1) {
+          const blob = item.getAsFile();
+          loadEmblemFile(blob);
+          break;
+        }
+      }
+    });
+
+    // --- Popover Color Picker Engine ---
+    const popover = document.getElementById('color-picker-popover');
+    const popoverTitle = document.getElementById('popover-title');
+    const popoverCloseBtn = document.getElementById('popover-close-btn');
+    const popoverSv = document.getElementById('popover-sv');
+    const popoverSvCursor = document.getElementById('popover-sv-cursor');
+    const popoverHue = document.getElementById('popover-hue');
+    const popoverPreviewSwatch = document.getElementById('popover-preview-swatch');
+    const popoverHexInput = document.getElementById('popover-hex-input');
+
+    let activeColorTarget = null; // { key, callback, swatchEl }
+    let currentHsv = { h: 0, s: 100, v: 100 };
+
+    function openColorPicker(title, initialHex, targetCallback, swatchButton) {
+      popoverTitle.innerText = title;
+      activeColorTarget = targetCallback;
+
+      const rgb = hexToRgb(initialHex);
+      const hsl = rgbToHsl(rgb.r, rgb.g, rgb.b);
+      // Convert HSL to HSV approximately for picker
+      const max = Math.max(rgb.r, rgb.g, rgb.b) / 255;
+      const min = Math.min(rgb.r, rgb.g, rgb.b) / 255;
+      const d = max - min;
+      const s = max === 0 ? 0 : d / max;
+      const v = max;
+      currentHsv = { h: hsl.h, s: s * 100, v: v * 100 };
+
+      updatePickerUI();
+
+      const rect = swatchButton.getBoundingClientRect();
+      popover.style.top = `${Math.min(window.innerHeight - 300, rect.bottom + 8)}px`;
+      popover.style.left = `${Math.max(10, Math.min(window.innerWidth - 280, rect.left))}px`;
+      popover.classList.remove('hidden');
+    }
+
+    function closeColorPicker() {
+      popover.classList.add('hidden');
+      activeColorTarget = null;
+    }
+
+    popoverCloseBtn.addEventListener('click', closeColorPicker);
+    document.addEventListener('click', (e) => {
+      if (!popover.contains(e.target) && !e.target.classList.contains('color-swatch-btn')) {
+        closeColorPicker();
+      }
+    });
+
+    function updatePickerUI() {
+      const rgb = hsvToRgb(currentHsv.h, currentHsv.s, currentHsv.v);
+      const hex = rgbToHex(rgb.r, rgb.g, rgb.b);
+
+      popoverHexInput.value = hex;
+      popoverPreviewSwatch.style.backgroundColor = hex;
+
+      // Pure hue color for SV box background
+      const pureHueRgb = hslToRgb(currentHsv.h, 100, 50);
+      popoverSv.style.backgroundColor = `rgb(${pureHueRgb.r}, ${pureHueRgb.g}, ${pureHueRgb.b})`;
+      popoverHue.value = currentHsv.h;
+
+      // Cursor position
+      popoverSvCursor.style.left = `${currentHsv.s}%`;
+      popoverSvCursor.style.top = `${100 - currentHsv.v}%`;
+
+      if (activeColorTarget) activeColorTarget(hex);
+    }
+
+    function hsvToRgb(h, s, v) {
+      s /= 100; v /= 100;
+      let r, g, b;
+      const i = Math.floor(h / 60);
+      const f = h / 60 - i;
+      const p = v * (1 - s);
+      const q = v * (1 - f * s);
+      const t = v * (1 - (1 - f) * s);
+      switch (i % 6) {
+        case 0: r = v, g = t, b = p; break;
+        case 1: r = q, g = v, b = p; break;
+        case 2: r = p, g = v, b = t; break;
+        case 3: r = p, g = q, b = v; break;
+        case 4: r = t, g = p, b = v; break;
+        case 5: r = v, g = p, b = q; break;
+      }
+      return { r: Math.round(r * 255), g: Math.round(g * 255), b: Math.round(b * 255) };
+    }
+
+    // SV Box drag
+    let isDraggingSv = false;
+    popoverSv.addEventListener('mousedown', (e) => { isDraggingSv = true; handleSvDrag(e); });
+    window.addEventListener('mousemove', (e) => { if (isDraggingSv) handleSvDrag(e); });
+    window.addEventListener('mouseup', () => { isDraggingSv = false; });
+
+    function handleSvDrag(e) {
+      const rect = popoverSv.getBoundingClientRect();
+      const x = Math.max(0, Math.min(rect.width, e.clientX - rect.left));
+      const y = Math.max(0, Math.min(rect.height, e.clientY - rect.top));
+      currentHsv.s = (x / rect.width) * 100;
+      currentHsv.v = 100 - (y / rect.height) * 100;
+      updatePickerUI();
+    }
+
+    popoverHue.addEventListener('input', (e) => {
+      currentHsv.h = parseFloat(e.target.value);
+      updatePickerUI();
+    });
+
+    popoverHexInput.addEventListener('input', (e) => {
+      if (/^#[0-9A-Fa-f]{6}$/.test(e.target.value)) {
+        const rgb = hexToRgb(e.target.value);
+        const hsl = rgbToHsl(rgb.r, rgb.g, rgb.b);
+        currentHsv.h = hsl.h;
+        if (activeColorTarget) activeColorTarget(e.target.value);
+      }
+    });
+
+    // Attach swatch pickers
+    swatchBg.addEventListener('click', () => openColorPicker('Card Background', state.bgColor, (hex) => { state.bgColor = hex; renderApp(); }, swatchBg));
+    swatchPrimary.addEventListener('click', () => openColorPicker('Primary Accent', state.primaryColor, (hex) => {
+      state.primaryColor = hex;
+      if (state.secondaryAuto) state.secondaryColor = calculateAutoSecondary(state.primaryColor);
+      renderApp();
+    }, swatchPrimary));
+    swatchSecondary.addEventListener('click', () => openColorPicker('Secondary Accent', state.secondaryColor, (hex) => {
+      state.secondaryColor = hex;
+      state.secondaryAuto = false;
+      renderApp();
+    }, swatchSecondary));
+    swatchEmblemTint.addEventListener('click', () => openColorPicker('Emblem Tint', state.emblemTint, (hex) => { state.emblemTint = hex; renderApp(); }, swatchEmblemTint));
+
+    // Midpoint Calculator Drawer Toggle
+    const btnToggleMidpoint = document.getElementById('btn-toggle-midpoint');
+    const midpointDrawer = document.getElementById('midpoint-drawer');
+    btnToggleMidpoint.addEventListener('click', () => { midpointDrawer.classList.toggle('hidden'); });
+
+    // --- Export Suite ---
+    async function exportCard(scaleFactor) {
+      const canvas = document.getElementById('export-canvas');
+      canvas.width = 600 * scaleFactor;
+      canvas.height = 900 * scaleFactor;
+      const ctx = canvas.getContext('2d');
+      ctx.imageSmoothingEnabled = true;
+      ctx.imageSmoothingQuality = 'high';
+
+      // 1. Background
+      ctx.fillStyle = state.bgColor;
+      ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+      // 2. Top Accent Bars
+      ctx.fillStyle = state.primaryColor;
+      ctx.fillRect(48.8 * scaleFactor, 32.51 * scaleFactor, 75.12 * scaleFactor, 18.77 * scaleFactor);
+
+      ctx.fillStyle = state.secondaryColor;
+      ctx.fillRect(123.91 * scaleFactor, 32.51 * scaleFactor, 75.12 * scaleFactor, 18.77 * scaleFactor);
+
+      // 3. Publisher Label
+      ctx.font = `600 ${21.33 * scaleFactor}px "Museo Sans Cyrl", "MuseoSansCyrl-900", "Inter", sans-serif`;
+      ctx.fillStyle = '#999999';
+      ctx.textAlign = 'right';
+      ctx.fillText((state.publisher || 'DEVELOPER').toUpperCase(), (600 - 48.8) * scaleFactor, (36.67 + 18) * scaleFactor);
+
+      // 4. Title (Multi-line)
+      ctx.font = `700 ${48 * scaleFactor}px "Museo Sans Cyrl", "MuseoSansCyrl-900", "Inter", sans-serif`;
+      ctx.fillStyle = '#000000';
+      ctx.textAlign = 'left';
+      const lines = (state.title || 'Game Title').split('\n');
+      let titleY = (92.77 + 40) * scaleFactor;
+      const lineHeight = 48 * 1.08 * scaleFactor;
+      for (const line of lines) {
+        ctx.fillText(line, 48.8 * scaleFactor, titleY);
+        titleY += lineHeight;
+      }
+
+      // 5. Center Graphic Block Frame & Background
+      ctx.fillStyle = state.primaryColor;
+      ctx.fillRect(48.8 * scaleFactor, 220 * scaleFactor, 502.4 * scaleFactor, 520 * scaleFactor);
+
+      // Save context for clipping center block
+      ctx.save();
+      ctx.beginPath();
+      ctx.rect(48.8 * scaleFactor, 220 * scaleFactor, 502.4 * scaleFactor, 520 * scaleFactor);
+      ctx.clip();
+
+      // Draw Emblem inside center block
+      const centerX = (48.8 + 502.4 / 2 + state.offsetX) * scaleFactor;
+      const centerY = (220 + 520 / 2 + state.offsetY) * scaleFactor;
+
+      ctx.save();
+      ctx.translate(centerX, centerY);
+      ctx.rotate((state.rotation * Math.PI) / 180);
+      ctx.scale(state.scale / 100, state.scale / 100);
+
+      if (state.emblemType === 'triangle') {
+        ctx.fillStyle = state.tintMode === 'monochrome' ? state.emblemTint : '#ffffff';
+        ctx.beginPath();
+        const triSize = 350 * scaleFactor;
+        ctx.moveTo(0, -triSize / 2);
+        ctx.lineTo(triSize / 2, triSize / 2);
+        ctx.lineTo(-triSize / 2, triSize / 2);
+        ctx.closePath();
+        ctx.fill();
+      } else if (state.customEmblemSrc) {
+        await new Promise((resolve) => {
+          const img = new Image();
+          img.crossOrigin = 'anonymous';
+          img.onload = () => {
+            const aspect = img.naturalWidth / img.naturalHeight;
+            let drawW = 380 * scaleFactor;
+            let drawH = drawW / aspect;
+            if (drawH > 420 * scaleFactor) {
+              drawH = 420 * scaleFactor;
+              drawW = drawH * aspect;
+            }
+
+            if (state.tintMode === 'monochrome') {
+              const offCanvas = document.createElement('canvas');
+              offCanvas.width = img.naturalWidth;
+              offCanvas.height = img.naturalHeight;
+              const offCtx = offCanvas.getContext('2d');
+              offCtx.drawImage(img, 0, 0);
+              offCtx.globalCompositeOperation = 'source-in';
+              offCtx.fillStyle = state.emblemTint;
+              offCtx.fillRect(0, 0, offCanvas.width, offCanvas.height);
+              ctx.drawImage(offCanvas, -drawW / 2, -drawH / 2, drawW, drawH);
+            } else {
+              ctx.drawImage(img, -drawW / 2, -drawH / 2, drawW, drawH);
+            }
+            resolve();
+          };
+          img.onerror = () => resolve();
+          img.src = state.customEmblemSrc;
+        });
+      }
+      ctx.restore();
+      ctx.restore(); // Restore clip
+
+      // 6. Release Year
+      ctx.font = `600 ${32 * scaleFactor}px "Museo Sans Cyrl", "MuseoSansCyrl-900", "Inter", sans-serif`;
+      ctx.fillStyle = '#999999';
+      ctx.textAlign = 'right';
+      ctx.fillText('/' + (state.year || '2024'), (600 - 48.8) * scaleFactor, 760 * scaleFactor);
+
+      // 7. Platform Footer Bar
+      ctx.fillStyle = state.primaryColor;
+      ctx.fillRect(0, 829.06 * scaleFactor, 600 * scaleFactor, 50.06 * scaleFactor);
+
+      ctx.font = `700 ${32 * scaleFactor}px "Museo Sans Cyrl", "MuseoSansCyrl-900", "Inter", sans-serif`;
+      ctx.fillStyle = '#ffffff';
+      ctx.textAlign = 'center';
+      ctx.fillText((state.platform || 'PC').toUpperCase(), 300 * scaleFactor, (829.06 + 35) * scaleFactor);
+
+      // Trigger download
+      const link = document.createElement('a');
+      link.download = `${(state.title || 'game').toLowerCase().replace(/\s+/g, '_')}_grid.png`;
+      link.href = canvas.toDataURL('image/png');
+      link.click();
+    }
+
+    document.getElementById('btn-export-png').addEventListener('click', () => exportCard(1));
+    document.getElementById('btn-export-hd').addEventListener('click', () => exportCard(2));
+
+    // SVG Export
+    document.getElementById('btn-export-svg').addEventListener('click', () => {
+      const svgString = `<svg xmlns="http://www.w3.org/2000/svg" width="600" height="900" viewBox="0 0 600 900">
+  <rect width="600" height="900" fill="${state.bgColor}"/>
+  <rect x="48.8" y="32.51" width="75.12" height="18.77" fill="${state.primaryColor}"/>
+  <rect x="123.91" y="32.51" width="75.12" height="18.77" fill="${state.secondaryColor}"/>
+  <text x="551.2" y="55" font-family="'Museo Sans Cyrl', sans-serif" font-weight="600" font-size="21.33" fill="#999999" text-anchor="end">${(state.publisher || 'DEVELOPER').toUpperCase()}</text>
+  <text x="48.8" y="130" font-family="'Museo Sans Cyrl', sans-serif" font-weight="700" font-size="48" fill="#000000">${state.title}</text>
+  <rect x="48.8" y="203.8" width="502.4" height="550.3" fill="${state.primaryColor}" rx="4"/>
+  <text x="551.2" y="805" font-family="'Museo Sans Cyrl', sans-serif" font-weight="600" font-size="29.33" fill="#999999" text-anchor="end">/${state.year}</text>
+  <rect x="0" y="829.06" width="600" height="50.06" fill="${state.primaryColor}"/>
+  <text x="300" y="863" font-family="'Museo Sans Cyrl', sans-serif" font-weight="700" font-size="32" fill="#ffffff" text-anchor="middle">${(state.platform || 'PC').toUpperCase()}</text>
+</svg>`;
+      const blob = new Blob([svgString], { type: 'image/svg+xml;charset=utf-8' });
+      const url = URL.createObjectURL(blob);
+      const link = document.createElement('a');
+      link.download = `${(state.title || 'game').toLowerCase().replace(/\s+/g, '_')}_grid.svg`;
+      link.href = url;
+      link.click();
+    });
+
+    // --- Font Loader & IndexedDB Persistence ---
+    const DB_NAME = 'SteamGridStudioDB';
+    const STORE_NAME = 'fonts';
+    const FONT_KEY = 'museo_sans_900';
+
+    function initDB() {
+      return new Promise((resolve, reject) => {
+        const request = indexedDB.open(DB_NAME, 1);
+        request.onerror = () => reject(request.error);
+        request.onsuccess = () => resolve(request.result);
+        request.onupgradeneeded = (e) => {
+          const db = e.target.result;
+          if (!db.objectStoreNames.contains(STORE_NAME)) {
+            db.createObjectStore(STORE_NAME);
+          }
+        };
+      });
+    }
+
+    async function saveFontToCache(arrayBuffer) {
+      try {
+        const db = await initDB();
+        const tx = db.transaction(STORE_NAME, 'readwrite');
+        tx.objectStore(STORE_NAME).put(arrayBuffer, FONT_KEY);
+      } catch (err) {
+        console.warn('Could not cache font to IndexedDB', err);
+      }
+    }
+
+    async function loadCachedFont() {
+      try {
+        const db = await initDB();
+        return new Promise((resolve) => {
+          const tx = db.transaction(STORE_NAME, 'readonly');
+          const req = tx.objectStore(STORE_NAME).get(FONT_KEY);
+          req.onsuccess = () => resolve(req.result);
+          req.onerror = () => resolve(null);
+        });
+      } catch (err) {
+        return null;
+      }
+    }
+
+    async function applyFontArrayBuffer(arrayBuffer) {
+      try {
+        const fontFace = new FontFace('Museo Sans Cyrl', arrayBuffer);
+        const loadedFace = await fontFace.load();
+        document.fonts.add(loadedFace);
+        document.getElementById('font-status-badge').classList.remove('hidden');
+        document.getElementById('font-status-badge').innerHTML = '<i class="fa-solid fa-check text-emerald-400"></i> Museo Sans 900 Loaded';
+      } catch (err) {
+        console.error('Failed to parse font file', err);
+      }
+    }
+
+    // Check cached font on startup
+    loadCachedFont().then(buf => {
+      if (buf) applyFontArrayBuffer(buf);
+    });
+
+    document.getElementById('font-file-input').addEventListener('change', async (e) => {
+      const file = e.target.files[0];
+      if (!file) return;
+      const buffer = await file.arrayBuffer();
+      await saveFontToCache(buffer);
+      await applyFontArrayBuffer(buffer);
+    });
+
+    // --- Initial Render ---
+    renderApp();
+  </script>
+</body>
+</html>
